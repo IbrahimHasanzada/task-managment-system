@@ -2,9 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api')
   const config = new DocumentBuilder()
     .setTitle('Task managment system')
@@ -14,8 +16,15 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
+
   app.useGlobalPipes(new ValidationPipe());
-  SwaggerModule.setup('docs', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory,
+    { swaggerOptions: { persistAuthorization: true } }
+  );
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

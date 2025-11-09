@@ -24,7 +24,7 @@ export default class AuthGuard implements CanActivate {
             let user = await this.userService.getUserById(payload.userId)
 
             if (!user) throw new UnauthorizedException()
-
+                
             this.clsService.set('user', user)
 
             return true

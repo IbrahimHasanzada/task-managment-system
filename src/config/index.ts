@@ -8,5 +8,6 @@ config({ path: envPath })
 
 export default {
     databaseUrl: process.env.DATABASE_URL,
-    superSecret: process.env.JWT_SECRET
+    superSecret: process.env.JWT_SECRET,
+    url: process.env.URL,
 }

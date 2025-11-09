@@ -20,7 +20,7 @@ async function bootstrap() {
         await userService.create({
             username: 'Admin',
             email: 'admin@example.com',
-            password: '$2b$10$u1mSuX2qgxXz7FTvPuvU6Odc4A28BCHwZ8Jidc6Ncq04akqhdXEL6',
+            password: 'admin123',
             roleId: adminRole.id, 
             avatar: 'alksdasd',
             phone: 'alksndlaksnd'

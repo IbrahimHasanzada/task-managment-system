@@ -16,8 +16,24 @@ export class UserService {
     ) { }
 
 
-    getUserById(id: number) {
-        return 'sdasd'
+    async getUserById(id: number) {
+        return await this.userRepo.findOne({
+            where: { id },
+            relations: ['role'],
+            select: {
+                id: true,
+                username: true,
+                avatar: true,
+                email: true,
+                phone: true,
+                role: {
+                    id: true,
+                    role: true
+                },
+                createdAt: true,
+                roleId: true,
+            }
+        })
     }
 
     async list() {

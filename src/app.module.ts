@@ -9,6 +9,9 @@ import { ClsModule } from 'nestjs-cls';
 import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static'
 
 @Module({
   imports: [
@@ -24,9 +27,14 @@ import { AuthModule } from './modules/auth/auth.module';
         mount: true
       }
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, 'uploads'),
+      serveRoot: '/uploads',
+    }),
     RoleModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    UploadsModule
   ],
   controllers: [AppController],
   providers: [AppService],

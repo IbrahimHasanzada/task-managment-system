@@ -17,8 +17,9 @@ export class AuthService {
         let user = await this.userRepo.findOne({ where: { email: params.email } })
         if (!user) throw new UnauthorizedException('Email yaxud parol səhvdir!')
 
+
         let checkPassword = await compare(params.password, user.password)
-        
+
         if (!checkPassword) throw new UnauthorizedException('Email yaxud parol səhvdir!')
 
         let token = this.authUtils.generateToken(user.id)

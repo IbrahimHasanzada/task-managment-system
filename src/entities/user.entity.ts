@@ -1,5 +1,6 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { RoleEntity } from "./role.entity";
+import { UploadsEntity } from "./uploads.entity";
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -10,7 +11,7 @@ export class UserEntity extends BaseEntity {
     username: string
 
     @Column()
-    avatar: string
+    avatarId: number
 
     @Column()
     phone: string
@@ -24,9 +25,12 @@ export class UserEntity extends BaseEntity {
     @Column()
     password: string
 
-    @OneToOne(() => RoleEntity, (role) => role.user)
-    @JoinColumn({ name: 'roleId' })
+    @ManyToOne(() => RoleEntity, (role) => role.user)
     role: RoleEntity
+
+    @OneToOne(() => UploadsEntity, (image) => image.user)
+    @JoinColumn({ name: 'avatarId' })
+    avatar: string
 
 
     @CreateDateColumn()

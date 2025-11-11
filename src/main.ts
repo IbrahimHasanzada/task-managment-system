@@ -7,7 +7,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   app.setGlobalPrefix('api')
+
   const config = new DocumentBuilder()
     .setTitle('Task managment system')
     .setDescription('The TMS API')
@@ -15,6 +17,8 @@ async function bootstrap() {
     .addTag('task-managment')
     .addBearerAuth()
     .build();
+
+  app.enableCors()
   const documentFactory = () => SwaggerModule.createDocument(app, config);
 
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {

@@ -1,14 +1,11 @@
 // uploads.controller.ts
 import { Controller, Post, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { UPLOAD_IMAGE_MAX_SIZE } from 'src/shared/constants/upload.constants';
-import { Auth } from 'src/shared/decorators/auth.decorator';
+import { UPLOAD_IMAGE_MAX_SIZE } from '../../shared/constants/upload.constants';
+import { Auth } from '../../shared/decorators/auth.decorator';
 import { imageFileFilter } from 'src/shared/utils/upload-filter.utils';
 import { UplaodsService } from './uploads.service';
-import { UploadInterceptor } from 'src/shared/interceptors/upload.interceptor';
+import { UploadInterceptor } from '../../shared/interceptors/upload.interceptor';
 
 @Controller('uploads')
 export class UploadsController {

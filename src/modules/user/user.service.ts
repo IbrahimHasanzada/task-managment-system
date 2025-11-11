@@ -6,12 +6,18 @@ import { UpdateUserDto } from './dto/update.dto';
 import { ClsService } from 'nestjs-cls';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
+import { UploadsEntity } from '../../entities/uploads.entity';
+import { RoleEntity } from 'src/entities/role.entity';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(UserEntity)
         private userRepo: Repository<UserEntity>,
+        @InjectRepository(UploadsEntity)
+        private uploadRepo: Repository<UploadsEntity>,
+        @InjectRepository(RoleEntity)
+        private roleRepo: Repository<RoleEntity>,
         private cls: ClsService
     ) { }
 
@@ -19,7 +25,7 @@ export class UserService {
     async getUserById(id: number) {
         return await this.userRepo.findOne({
             where: { id },
-            relations: ['role'],
+            relations: ['role', 'avatar'],
             select: {
                 id: true,
                 username: true,
@@ -37,7 +43,7 @@ export class UserService {
     }
 
     async list() {
-        return await this.userRepo.find({ relations: ['role'] })
+        return await this.userRepo.find({ relations: ['role', 'avatar'] })
     }
 
     async findByEmail(email: string) {
@@ -49,6 +55,10 @@ export class UserService {
         let user = await this.userRepo.findOne({ where: { email: params.email } })
 
         if (user) throw new ConflictException('Əməkdaş artıq mövcuddur!')
+
+        let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
+
+        if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
 
         params.password = await hash(params.password, 10)
 
@@ -64,14 +74,30 @@ export class UserService {
     async update(id: number, params: UpdateUserDto) {
         let user = this.cls.get('user')
 
+        
         let checkedUser = await this.userRepo.findOne({ where: { id } })
 
         if (!checkedUser) throw new NotFoundException('Əməkdaş tapılmadı!')
 
-        if (user.role !== 'admin') {
+
+        if (params.roleId && user.role.role !== 'admin') {
             if (user.id != id) throw new BadRequestException('Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur!')
         }
 
+        if (params.avatarId) {
+
+            let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
+
+            if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+        }
+
+
+        if (user.role == 'admin' && params.roleId) {
+
+            let role = await this.roleRepo.findOne({ where: { id: params.roleId } })
+
+            if (!role) throw new NotFoundException('Vəzifə tapılmadı!')
+        }
 
         const updatedUser = Object.assign(checkedUser, {
             ...params,
@@ -80,13 +106,14 @@ export class UserService {
                     ? params.roleId ?? checkedUser.roleId
                     : checkedUser.roleId,
             username: params.username ?? checkedUser.username,
-            avatar: params.avatar ?? checkedUser.avatar,
+            avatarId: params.avatarId ?? checkedUser.avatarId,
             email: params.email ?? checkedUser.email,
             phone: params.phone ?? checkedUser.phone,
         });
 
 
         await updatedUser.save()
+        return { message: 'Əməkdaş uğurla yeniləndi!' }
     }
 
     async deleteUser(id: number) {
@@ -96,7 +123,7 @@ export class UserService {
 
         if (!checkUser) throw new NotFoundException('Əməkdaş tapılmadı!')
 
-        if (user.role !== 'admin') {
+        if (user.role.role !== 'admin') {
             if (user.id !== id) throw new BadRequestException('Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur!')
         }
 

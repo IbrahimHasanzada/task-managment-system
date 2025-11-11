@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class CreateUserDto {
     @Type()
@@ -9,9 +9,9 @@ export class CreateUserDto {
     username: string
 
     @Type()
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    avatar: string
+    avatarId: number
 
     @Type()
     @IsString()
@@ -29,7 +29,7 @@ export class CreateUserDto {
     password: string
 
     @Type()
-    @IsString()
+    @IsNumber()
     @ApiProperty()
     roleId: number
 }

@@ -22,9 +22,10 @@ async function bootstrap() {
             email: 'admin@example.com',
             password: 'admin123',
             roleId: adminRole.id, 
-            avatar: 'alksdasd',
+            avatarId: 1,
             phone: 'alksndlaksnd'
         });
+
         console.log('Admin user yaradıldı');
     } else {
         console.log('Admin user artıq mövcuddur.');

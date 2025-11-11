@@ -13,9 +13,20 @@ export default class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         let request = context.switchToHttp().getRequest()
 
-        let authorization = request.headers.authorization || ''
+        console.log(request.headers?.AUTHORIZATION)
+        const authorization: string | undefined =
+            request.headers?.authorization ||
+            request.headers?.Authorization ||
+            request.headers?.AUTHORIZATION
 
-        let token = authorization.split(' ')[1]
+        if (!authorization) {
+            throw new UnauthorizedException('Authorization header missing')
+        }
+
+        const [scheme, token] = authorization.split(' ')
+        if (!scheme || scheme.toLowerCase() !== 'bearer' || !token) {
+            throw new UnauthorizedException('Invalid Authorization header format')
+        }
         try {
             let payload = this.jwtService.verify(token)
 
@@ -24,7 +35,7 @@ export default class AuthGuard implements CanActivate {
             let user = await this.userService.getUserById(payload.userId)
 
             if (!user) throw new UnauthorizedException()
-                
+
             this.clsService.set('user', user)
 
             return true

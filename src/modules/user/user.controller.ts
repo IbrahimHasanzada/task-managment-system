@@ -26,6 +26,13 @@ export class UserController {
     async createUser(@Body() body: CreateUserDto) {
         return await this.userService.create(body);
     }
+    @Post('me')
+    @Auth()
+    async updateMe(
+        @Body() body: UpdateUserDto,
+    ) {
+        return await this.userService.updateMe(body);
+    }
 
     @Post(':id')
     @Auth()
@@ -35,6 +42,8 @@ export class UserController {
     ) {
         return await this.userService.update(id, body);
     }
+
+
 
     @Delete(':id')
     @Auth()

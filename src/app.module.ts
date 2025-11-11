@@ -12,6 +12,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static'
+import { FolderModule } from './modules/folder/folder.module';
+import { TaskListModule } from './modules/tasklist/tasklist.module';
+import { TaskModule } from './modules/task/task.module';
 
 @Module({
   imports: [
@@ -34,7 +37,10 @@ import { ServeStaticModule } from '@nestjs/serve-static'
     RoleModule,
     UserModule,
     AuthModule,
-    UploadsModule
+    UploadsModule,
+    FolderModule,
+    TaskListModule,
+    TaskModule
   ],
   controllers: [AppController],
   providers: [AppService],

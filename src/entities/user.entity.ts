@@ -25,7 +25,7 @@ export class UserEntity extends BaseEntity {
     @Column()
     password: string
 
-    @ManyToOne(() => RoleEntity, (role) => role.user)
+    @ManyToOne(() => RoleEntity, (role) => role.user, { onDelete: 'SET NULL' })
     role: RoleEntity
 
     @OneToOne(() => UploadsEntity, (image) => image.user)

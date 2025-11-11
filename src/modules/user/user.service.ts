@@ -72,17 +72,11 @@ export class UserService {
 
 
     async update(id: number, params: UpdateUserDto) {
-        let user = this.cls.get('user')
 
-        
         let checkedUser = await this.userRepo.findOne({ where: { id } })
 
         if (!checkedUser) throw new NotFoundException('Əməkdaş tapılmadı!')
 
-
-        if (params.roleId && user.role.role !== 'admin') {
-            if (user.id != id) throw new BadRequestException('Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur!')
-        }
 
         if (params.avatarId) {
 
@@ -92,19 +86,13 @@ export class UserService {
         }
 
 
-        if (user.role == 'admin' && params.roleId) {
+        let role = await this.roleRepo.findOne({ where: { id: params.roleId } })
 
-            let role = await this.roleRepo.findOne({ where: { id: params.roleId } })
-
-            if (!role) throw new NotFoundException('Vəzifə tapılmadı!')
-        }
+        if (!role) throw new NotFoundException('Vəzifə tapılmadı!')
 
         const updatedUser = Object.assign(checkedUser, {
             ...params,
-            roleId:
-                user.role === 'admin'
-                    ? params.roleId ?? checkedUser.roleId
-                    : checkedUser.roleId,
+            roleId: params.roleId ?? checkedUser.roleId,
             username: params.username ?? checkedUser.username,
             avatarId: params.avatarId ?? checkedUser.avatarId,
             email: params.email ?? checkedUser.email,
@@ -114,6 +102,30 @@ export class UserService {
 
         await updatedUser.save()
         return { message: 'Əməkdaş uğurla yeniləndi!' }
+    }
+
+    async updateMe(params: UpdateUserDto) {
+
+        let user = this.cls.get('user')
+
+        if (params.avatarId) {
+
+            let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
+
+            if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+        }
+
+        const updatedUser = Object.assign(user, {
+            ...params,
+            username: params.username ?? user.username,
+            avatarId: params.avatarId ?? user.avatarId,
+            email: params.email ?? user.email,
+            phone: params.phone ?? user.phone,
+        });
+
+
+        await updatedUser.save()
+        return { message: 'Hesabınız uğurla yeniləndi!' }
     }
 
     async deleteUser(id: number) {

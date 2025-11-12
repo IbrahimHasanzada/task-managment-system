@@ -20,7 +20,7 @@ export class TaskController {
 		return await this.taskService.create(body)
 	}
 
-	@Put(':id')
+	@Post(':id')
 	@Auth()
 	async update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateTaskDto) {
 		return await this.taskService.update(id, body)

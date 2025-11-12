@@ -7,7 +7,7 @@ import { ClsService } from 'nestjs-cls';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
 import { UploadsEntity } from '../../entities/uploads.entity';
-import { RoleEntity } from 'src/entities/role.entity';
+import { RoleEntity } from '../../entities/role.entity';
 
 @Injectable()
 export class UserService {

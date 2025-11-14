@@ -6,7 +6,6 @@ import database from './config/database';
 import { JwtModule } from '@nestjs/jwt';
 import config from './config';
 import { ClsModule } from 'nestjs-cls';
-import { RoleModule } from './modules/role/role.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
@@ -34,7 +33,6 @@ import { TaskModule } from './modules/task/task.module';
       rootPath: join(__dirname, 'uploads'),
       serveRoot: '/uploads',
     }),
-    RoleModule,
     UserModule,
     AuthModule,
     UploadsModule,

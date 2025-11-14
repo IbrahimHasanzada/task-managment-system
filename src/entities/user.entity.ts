@@ -1,6 +1,6 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { RoleEntity } from "./role.entity";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UploadsEntity } from "./uploads.entity";
+import { RoleEnum } from "../shared/enums/role.enum";
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -20,13 +20,10 @@ export class UserEntity extends BaseEntity {
     email: string
 
     @Column()
-    roleId: number
-
-    @Column()
     password: string
 
-    @ManyToOne(() => RoleEntity, (role) => role.user, { onDelete: 'SET NULL' })
-    role: RoleEntity
+    @Column({ enum: RoleEnum })
+    role: RoleEnum
 
     @OneToOne(() => UploadsEntity, (image) => image.user)
     @JoinColumn({ name: 'avatarId' })

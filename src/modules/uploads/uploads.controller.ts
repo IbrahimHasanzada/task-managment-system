@@ -3,7 +3,6 @@ import { Controller, Post, UploadedFile, UseInterceptors, ParseFilePipe, MaxFile
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UPLOAD_IMAGE_MAX_SIZE } from '../../shared/constants/upload.constants';
 import { Auth } from '../../shared/decorators/auth.decorator';
-import { imageFileFilter } from 'src/shared/utils/upload-filter.utils';
 import { UplaodsService } from './uploads.service';
 import { UploadInterceptor } from '../../shared/interceptors/upload.interceptor';
 

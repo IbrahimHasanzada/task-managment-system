@@ -1,27 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { UserService } from '../modules/user/user.service';
-import { RoleService } from '../modules/role/role.service';
+import { RoleEnum } from '../shared/enums/role.enum';
 
 async function bootstrap() {
     const app = await NestFactory.createApplicationContext(AppModule);
 
     const userService = app.get(UserService);
-    const roleService = app.get(RoleService);
 
-    let adminRole = await roleService.findByName('admin');
-    if (!adminRole) {
-        adminRole = await roleService.create({ role: 'admin' });
-        console.log('Role "admin" yaradıldı');
-    }
 
     const adminUser = await userService.findByEmail('admin@example.com');
     if (!adminUser) {
-        await userService.create({
+        await userService.createAdmin({
             username: 'Admin',
             email: 'admin@example.com',
             password: 'admin123',
-            roleId: adminRole.id, 
+            role: RoleEnum.ADMIN, 
             avatarId: 1,
             phone: 'alksndlaksnd'
         });

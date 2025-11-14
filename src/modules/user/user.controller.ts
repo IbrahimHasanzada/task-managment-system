@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update.dto';
 import { CreateUserDto } from './dto/create.dto';
 import { Auth } from '../../shared/decorators/auth.decorator';
+import { RoleEnum } from '../../shared/enums/role.enum';
 
 @Controller('user')
 export class UserController {
@@ -22,7 +23,7 @@ export class UserController {
     }
 
     @Post()
-    @Auth()
+    @Auth(RoleEnum.ADMIN)
     async createUser(@Body() body: CreateUserDto) {
         return await this.userService.create(body);
     }
@@ -46,7 +47,7 @@ export class UserController {
 
 
     @Delete(':id')
-    @Auth()
+    @Auth(RoleEnum.ADMIN)
     async deleteUser(@Param('id') id: number) {
         return await this.userService.deleteUser(id);
     }

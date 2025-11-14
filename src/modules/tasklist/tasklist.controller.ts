@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { TaskListService } from "./tasklist.service";
 import { CreateTaskListDto } from "./dto/create-tasklist.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
@@ -18,6 +18,11 @@ export class TaskListController {
 	@Auth()
 	async create(@Body() body: CreateTaskListDto) {
 		return await this.taskListService.create(body)
+	}
+
+	@Delete(':id')
+	async deleteTaskList(@Param("id") id: number) {
+		return await this.taskListService.deleteTaskList(id)
 	}
 }
 

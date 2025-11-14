@@ -1,16 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { TaskEntity } from "../../entities/task.entity";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
 import { ReorderTaskDto } from "./dto/reorder-task.dto";
+import { ClsService } from "nestjs-cls";
 
 @Injectable()
 export class TaskService {
 	constructor(
 		@InjectRepository(TaskEntity)
-		private taskRepo: Repository<TaskEntity>
+		private taskRepo: Repository<TaskEntity>,
+		private cls: ClsService
 	) { }
 
 	async create(dto: CreateTaskDto) {
@@ -23,7 +25,7 @@ export class TaskService {
 			status: dto.status,
 			startAt: dto.startAt ? new Date(dto.startAt) : null,
 			dueAt: dto.dueAt ? new Date(dto.dueAt) : null,
-			order: count 
+			order: count
 		} as Partial<TaskEntity>)
 		return await this.taskRepo.save(task)
 	}
@@ -43,7 +45,6 @@ export class TaskService {
 		if (dto.assigneeId !== undefined) task.assigneeId = dto.assigneeId
 		if (dto.status !== undefined) task.status = dto.status
 		if (dto.taskListId !== undefined && dto.taskListId !== task.taskListId) {
-			// close gap in old list
 			await this.taskRepo
 				.createQueryBuilder()
 				.update(TaskEntity)
@@ -51,7 +52,6 @@ export class TaskService {
 				.where('"taskListId" = :listId AND "order" > :oldOrder', { listId: task.taskListId, oldOrder: task.order })
 				.execute()
 
-			// move to end of new list
 			const newIndex = await this.taskRepo.count({ where: { taskListId: dto.taskListId } })
 			task.taskListId = dto.taskListId
 			task.order = newIndex
@@ -60,7 +60,6 @@ export class TaskService {
 		return await this.taskRepo.save(task)
 	}
 
-	// Reorder task within the same list
 	async reorder(params: ReorderTaskDto) {
 		const task = await this.taskRepo.findOne({ where: { id: params.taskId } })
 		if (!task) throw new NotFoundException('Task not found')
@@ -75,7 +74,6 @@ export class TaskService {
 		if (targetIndex === currentOrder) return task
 
 		if (targetIndex < currentOrder) {
-			// shift down [targetIndex, currentOrder-1] (+1)
 			await this.taskRepo
 				.createQueryBuilder()
 				.update(TaskEntity)
@@ -83,7 +81,6 @@ export class TaskService {
 				.where('"taskListId" = :listId AND "order" >= :start AND "order" < :end', { listId: currentListId, start: targetIndex, end: currentOrder })
 				.execute()
 		} else {
-			// shift up (currentOrder+1..targetIndex) (-1)
 			await this.taskRepo
 				.createQueryBuilder()
 				.update(TaskEntity)
@@ -93,6 +90,22 @@ export class TaskService {
 		}
 		task.order = targetIndex
 		return await this.taskRepo.save(task)
+	}
+
+	async deleteTask(id: number) {
+		let user = this.cls.get('user')
+
+		let task = await this.taskRepo.findOne({ where: { id } })
+
+		if (!task) throw new NotFoundException('Tapşırıq tapılmadı!')
+
+		if (user.role != 'admin') {
+			if (user.id != task.assignee.id) throw new UnauthorizedException('Tapşırığı silmək üçün icazəniz yoxdur!')
+		}
+
+		await this.taskRepo.delete({ id })
+
+		return { message: "Tapşırıq uğurla silindi!" }
 	}
 }
 

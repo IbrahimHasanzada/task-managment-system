@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create.dto';
+import { CreateAdminDto, CreateUserDto } from './dto/create.dto';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../../entities/user.entity';
 import { UpdateUserDto } from './dto/update.dto';
@@ -7,7 +7,7 @@ import { ClsService } from 'nestjs-cls';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
 import { UploadsEntity } from '../../entities/uploads.entity';
-import { RoleEntity } from '../../entities/role.entity';
+import { RoleEnum } from '../../shared/enums/role.enum';
 
 @Injectable()
 export class UserService {
@@ -16,8 +16,6 @@ export class UserService {
         private userRepo: Repository<UserEntity>,
         @InjectRepository(UploadsEntity)
         private uploadRepo: Repository<UploadsEntity>,
-        @InjectRepository(RoleEntity)
-        private roleRepo: Repository<RoleEntity>,
         private cls: ClsService
     ) { }
 
@@ -25,25 +23,21 @@ export class UserService {
     async getUserById(id: number) {
         return await this.userRepo.findOne({
             where: { id },
-            relations: ['role', 'avatar'],
+            relations: ['avatar'],
             select: {
                 id: true,
                 username: true,
                 avatar: true,
                 email: true,
                 phone: true,
-                role: {
-                    id: true,
-                    role: true
-                },
+                role: true,
                 createdAt: true,
-                roleId: true,
             }
         })
     }
 
     async list() {
-        return await this.userRepo.find({ relations: ['role', 'avatar'] })
+        return await this.userRepo.find({ relations: ['avatar'] })
     }
 
     async findByEmail(email: string) {
@@ -52,6 +46,31 @@ export class UserService {
 
 
     async create(params: CreateUserDto) {
+        let user = await this.userRepo.findOne({ where: { email: params.email } })
+
+        if (user) throw new ConflictException('Əməkdaş artıq mövcuddur!')
+
+        let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
+
+        if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+
+        params.password = await hash(params.password, 10)
+
+        user = this.userRepo.create({
+            avatarId: params.avatarId,
+            email: params.email,
+            username: params.username,
+            password: params.password,
+            phone: params.phone,
+            role: RoleEnum.USER,
+        })
+
+        await user.save()
+
+        return { message: 'Əməkdaş uğurla yaradıldı!' }
+    }
+
+    async createAdmin(params: CreateAdminDto) {
         let user = await this.userRepo.findOne({ where: { email: params.email } })
 
         if (user) throw new ConflictException('Əməkdaş artıq mövcuddur!')
@@ -86,13 +105,9 @@ export class UserService {
         }
 
 
-        let role = await this.roleRepo.findOne({ where: { id: params.roleId } })
-
-        if (!role) throw new NotFoundException('Vəzifə tapılmadı!')
 
         const updatedUser = Object.assign(checkedUser, {
             ...params,
-            roleId: params.roleId ?? checkedUser.roleId,
             username: params.username ?? checkedUser.username,
             avatarId: params.avatarId ?? checkedUser.avatarId,
             email: params.email ?? checkedUser.email,
@@ -135,11 +150,12 @@ export class UserService {
 
         if (!checkUser) throw new NotFoundException('Əməkdaş tapılmadı!')
 
-        if (user.role.role !== 'admin') {
+        if (user.role !== 'admin') {
             if (user.id !== id) throw new BadRequestException('Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur!')
         }
 
         await this.userRepo.delete({ id })
+       
         return { message: user.id == id ? 'Hesabınız uğurla silindi!' : 'Əməkdaş uğurla silindi!' }
     }
 }

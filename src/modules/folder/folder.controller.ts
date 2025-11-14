@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { FolderService } from "./folder.service";
 import { CreateFolderDto } from "./dto/create-folder.dto";
 import { ApiTags } from "@nestjs/swagger";
@@ -31,5 +31,11 @@ export class FolderController {
 		const user = this.cls.get('user')
 		return await this.folderService.listByOwner(user.id)
 	}
+
+	@Delete(':id')
+	async deleteFolder(@Param("id") id: number) {
+		return await this.folderService.deleteFolder(id)
+	}
+
 }
 

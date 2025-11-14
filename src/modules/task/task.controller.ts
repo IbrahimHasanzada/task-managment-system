@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, ParseIntPipe } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, ParseIntPipe, Delete } from "@nestjs/common";
 import { TaskService } from "./task.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { Auth } from "../../shared/decorators/auth.decorator";
@@ -30,6 +30,11 @@ export class TaskController {
 	@Auth()
 	async reorder(@Body() body: ReorderTaskDto) {
 		return await this.taskService.reorder(body)
+	}
+
+	@Delete(':id')
+	async deleteTask(@Param("id") id: number) {
+		return await this.taskService.deleteTask(id)
 	}
 }
 

@@ -6,11 +6,6 @@ export class ReorderTaskDto {
 	@Type(() => Number)
 	@IsNumber()
 	@ApiProperty()
-	taskId: number
-
-	@Type(() => Number)
-	@IsNumber()
-	@ApiProperty()
 	targetIndex: number
 }
 

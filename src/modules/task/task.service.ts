@@ -60,8 +60,8 @@ export class TaskService {
 		return await this.taskRepo.save(task)
 	}
 
-	async reorder(params: ReorderTaskDto) {
-		const task = await this.taskRepo.findOne({ where: { id: params.taskId } })
+	async reorder(params: ReorderTaskDto, id: number) {
+		const task = await this.taskRepo.findOne({ where: { id } })
 		if (!task) throw new NotFoundException('Task not found')
 
 		const currentListId = task.taskListId

@@ -25,7 +25,10 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+  }));
   SwaggerModule.setup('docs', app, documentFactory,
     { swaggerOptions: { persistAuthorization: true } }
   );

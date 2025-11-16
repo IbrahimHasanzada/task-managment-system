@@ -13,6 +13,9 @@ export class UplaodsService {
 
 
     async saveFile(file: Express.Multer.File) {
+
+        file.filename = file.filename.replace(/\\/g, '/');
+        
         let result = await this.imageRepo.save({
             url: config.url + '/uploads/' + file.filename,
         });

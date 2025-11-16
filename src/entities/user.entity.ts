@@ -27,7 +27,7 @@ export class UserEntity extends BaseEntity {
 
     @OneToOne(() => UploadsEntity, (image) => image.user)
     @JoinColumn({ name: 'avatarId' })
-    avatar: string
+    avatar: UploadsEntity
 
 
     @CreateDateColumn()

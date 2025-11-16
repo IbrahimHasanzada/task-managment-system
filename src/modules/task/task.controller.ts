@@ -26,10 +26,13 @@ export class TaskController {
 		return await this.taskService.update(id, body)
 	}
 
-	@Post('reorder')
+	@Post('reorder/:id')
 	@Auth()
-	async reorder(@Body() body: ReorderTaskDto) {
-		return await this.taskService.reorder(body)
+	async reorder(
+		@Param('id') id: number,
+		@Body() body: ReorderTaskDto
+	) {
+		return await this.taskService.reorder(body, id)
 	}
 
 	@Delete(':id')

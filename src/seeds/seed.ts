@@ -11,7 +11,7 @@ async function bootstrap() {
 
     const adminUser = await userService.findByEmail('admin@example.com');
     if (!adminUser) {
-        await userService.createAdmin({
+        await userService.create({
             username: 'Admin',
             email: 'admin@example.com',
             password: 'admin123',

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString, IsOptional } from "class-validator";
 import { RoleEnum } from "../../../shared/enums/role.enum";
 
 export class CreateUserDto {
@@ -11,8 +11,9 @@ export class CreateUserDto {
 
     @Type()
     @IsNumber()
-    @ApiProperty()
-    avatarId: number
+    @IsOptional()
+    @ApiProperty({ required: false })
+    avatarId?: number
 
     @Type()
     @IsString()
@@ -28,6 +29,12 @@ export class CreateUserDto {
     @IsString()
     @ApiProperty()
     password: string
+
+    @Type()
+    @IsString()
+    @IsOptional()
+    @ApiProperty({ enum: RoleEnum, required: false, default: RoleEnum.USER })
+    role?: RoleEnum
 }
 
 export class CreateAdminDto {
@@ -38,8 +45,9 @@ export class CreateAdminDto {
 
     @Type()
     @IsNumber()
-    @ApiProperty()
-    avatarId: number
+    @IsOptional()
+    @ApiProperty({ required: false })
+    avatarId?: number
 
     @Type()
     @IsString()

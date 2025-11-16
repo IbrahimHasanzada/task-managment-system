@@ -36,8 +36,28 @@ export class UserService {
         })
     }
 
-    async list() {
-        return await this.userRepo.find({ relations: ['avatar'] })
+    async list(role?: RoleEnum, search?: string) {
+        const queryBuilder = this.userRepo
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.avatar', 'avatar');
+
+        if (role) {
+            queryBuilder.where('user.role = :role', { role });
+        }
+
+        if (search) {
+            if (role) {
+                queryBuilder.andWhere('(user.username ILIKE :search OR user.email ILIKE :search)', {
+                    search: `%${search}%`,
+                });
+            } else {
+                queryBuilder.where('(user.username ILIKE :search OR user.email ILIKE :search)', {
+                    search: `%${search}%`,
+                });
+            }
+        }
+
+        return await queryBuilder.getMany();
     }
 
     async findByEmail(email: string) {
@@ -50,19 +70,21 @@ export class UserService {
 
         if (user) throw new ConflictException('Əməkdaş artıq mövcuddur!')
 
-        let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
+        if (params.avatarId) {
+            let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
 
-        if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+            if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+        }
 
         params.password = await hash(params.password, 10)
 
         user = this.userRepo.create({
-            avatarId: params.avatarId,
+            avatarId: params.avatarId ?? null,
             email: params.email,
             username: params.username,
             password: params.password,
             phone: params.phone,
-            role: RoleEnum.USER,
+            role: params.role ?? RoleEnum.USER,
         })
 
         await user.save()
@@ -75,13 +97,18 @@ export class UserService {
 
         if (user) throw new ConflictException('Əməkdaş artıq mövcuddur!')
 
-        let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
+        if (params.avatarId) {
+            let avatar = await this.uploadRepo.findOne({ where: { id: params.avatarId } })
 
-        if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+            if (!avatar) throw new NotFoundException('Şəkil tapılmadı!')
+        }
 
         params.password = await hash(params.password, 10)
 
-        user = this.userRepo.create(params)
+        user = this.userRepo.create({
+            ...params,
+            avatarId: params.avatarId ?? null,
+        })
 
         await user.save()
 

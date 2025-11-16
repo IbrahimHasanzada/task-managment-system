@@ -14,6 +14,7 @@ import { ServeStaticModule } from '@nestjs/serve-static'
 import { FolderModule } from './modules/folder/folder.module';
 import { TaskListModule } from './modules/tasklist/tasklist.module';
 import { TaskModule } from './modules/task/task.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { TaskModule } from './modules/task/task.module';
     UploadsModule,
     FolderModule,
     TaskListModule,
-    TaskModule
+    TaskModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [AppService],

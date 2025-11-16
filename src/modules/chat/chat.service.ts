@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { ChatRoomEntity, ChatRoomType } from '../../entities/chat-room.entity';
+import { ChatRoomEntity } from '../../entities/chat-room.entity';
 import { ChatRoomMemberEntity } from '../../entities/chat-room-member.entity';
 import { MessageEntity } from '../../entities/message.entity';
 import { UserEntity } from '../../entities/user.entity';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateDirectChatDto } from './dto/create-direct-chat.dto';
+import { ChatRoomType } from 'src/shared/enums/chat-room-type.enum';
 
 @Injectable()
 export class ChatService {

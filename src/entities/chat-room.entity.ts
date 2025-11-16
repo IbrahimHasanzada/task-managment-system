@@ -12,11 +12,9 @@ import {
 import { UserEntity } from './user.entity';
 import { ChatRoomMemberEntity } from './chat-room-member.entity';
 import { MessageEntity } from './message.entity';
+import { ChatRoomType } from 'src/shared/enums/chat-room-type.enum';
 
-export enum ChatRoomType {
-    DIRECT = 'direct',
-    GROUP = 'group',
-}
+
 
 @Entity('chat_room')
 export class ChatRoomEntity extends BaseEntity {
@@ -24,16 +22,16 @@ export class ChatRoomEntity extends BaseEntity {
     id: number;
 
     @Column({ nullable: true })
-    name: string; // For group chats
+    name: string; 
 
     @Column({ nullable: true })
-    description: string; // For group chats
+    description: string;
 
     @Column({ type: 'enum', enum: ChatRoomType, default: ChatRoomType.DIRECT })
     type: ChatRoomType;
 
     @Column({ nullable: true })
-    createdById: number; // For group chats
+    createdById: number; 
 
     @ManyToOne(() => UserEntity)
     @JoinColumn({ name: 'createdById' })

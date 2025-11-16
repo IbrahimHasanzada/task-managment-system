@@ -29,4 +29,26 @@ export class AuthService {
             token: token
         }
     }
+
+    async verifyToken(userId: number) {
+        const user = await this.userRepo.findOne({
+            where: { id: userId },
+            relations: ['avatar'],
+            select: {
+                id: true,
+                username: true,
+                avatar: true,
+                email: true,
+                phone: true,
+                role: true,
+                createdAt: true,
+            }
+        });
+
+        if (!user) {
+            throw new UnauthorizedException('İstifadəçi tapılmadı!');
+        }
+
+        return user;
+    }
 }
